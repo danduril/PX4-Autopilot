@@ -299,9 +299,11 @@ all_variants_%:
 	$(foreach a,$(filter $(subst all_variants_,,$@)_%, $(ALL_CONFIG_TARGETS)), $(call cmake-build,$(a)$(BUILD_DIR_SUFFIX)))
 
 uorb_graphs:
-	@./Tools/uorb_graph/create.py --src-path src --exclude-path src/examples --exclude-path src/lib --file Tools/uorb_graph/graph_full
+	@./Tools/uorb_graph/create.py --src-path src --exclude-path src/examples --exclude-path src/lib/parameters --merge-depends --file Tools/uorb_graph/graph_full
+	@./Tools/uorb_graph/create.py --src-path src --exclude-path src/examples --exclude-path src/lib/parameters --exclude-path src/modules/mavlink --merge-depends --file Tools/uorb_graph/graph_full_no_mavlink
 	@$(MAKE) --no-print-directory px4_fmu-v2_default uorb_graph
 	@$(MAKE) --no-print-directory px4_fmu-v4_default uorb_graph
+	@$(MAKE) --no-print-directory px4_fmu-v5_default uorb_graph
 	@$(MAKE) --no-print-directory px4_sitl_default uorb_graph
 
 
@@ -488,7 +490,7 @@ distclean: gazeboclean
 	@rm -rf "$(SRC_DIR)/build"
 	@git clean --force -X "$(SRC_DIR)/msg/" "$(SRC_DIR)/platforms/" "$(SRC_DIR)/posix-configs/" "$(SRC_DIR)/ROMFS/" "$(SRC_DIR)/src/" "$(SRC_DIR)/test/" "$(SRC_DIR)/Tools/"
 
-# Help / Error
+# Help / Error / Misc
 # --------------------------------------------------------------------
 
 # All other targets are handled by PX4_MAKE. Add a rule here to avoid printing an error.
@@ -522,3 +524,18 @@ check_px4: $(call make_list,nuttx,"px4") \
 
 check_nxp: $(call make_list,nuttx,"nxp") \
 	sizes
+
+ifneq ($(ROS2_WS_DIR),)
+  ROS2_WS_DIR := $(basename ${ROS2_WS_DIR})
+else
+  ROS2_WS_DIR := ~/colcon_ws
+endif
+
+update_ros2_bridge:
+	@Tools/update_px4_ros2_bridge.sh --ws_dir ${ROS2_WS_DIR} --all
+
+update_px4_ros_com:
+	@Tools/update_px4_ros2_bridge.sh --ws_dir ${ROS2_WS_DIR} --px4_ros_com
+
+update_px4_msgs:
+	@Tools/update_px4_ros2_bridge.sh --ws_dir ${ROS2_WS_DIR} --px4_msgs

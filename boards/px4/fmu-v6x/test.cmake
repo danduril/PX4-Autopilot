@@ -1,9 +1,6 @@
 
 px4_add_board(
 	PLATFORM nuttx
-	VENDOR px4
-	MODEL fmu-v6x
-	LABEL test
 	TOOLCHAIN arm-none-eabi
 	ARCHITECTURE cortex-m7
 	ROMFSROOT px4fmu_common
@@ -20,14 +17,15 @@ px4_add_board(
 		TEL3:/dev/ttyS1
 		GPS2:/dev/ttyS7
 	DRIVERS
-		adc/ads1115
+		#adc/ads1115
 		adc/board_adc
-		barometer # all available barometer drivers
-		batt_smbus
-		camera_capture
+		#barometer # all available barometer drivers
+		barometer/bmp388
+		#batt_smbus
+		#camera_capture
 		camera_trigger
 		differential_pressure # all available differential pressure drivers
-		distance_sensor # all available distance sensor drivers
+		#distance_sensor # all available distance sensor drivers
 		dshot
 		gps
 		heater
@@ -37,33 +35,36 @@ px4_add_board(
 		imu/invensense/icm20649
 		imu/invensense/icm20948 # required for ak09916 mag
 		imu/invensense/icm42688p
-		irlock
+		#irlock
 		lights # all available light drivers
-		magnetometer # all available magnetometer drivers
-		optical_flow # all available optical flow drivers
-		osd
-		pca9685
-		pca9685_pwm_out
+		#magnetometer # all available magnetometer drivers
+		magnetometer/bosch/bmm150
+		magnetometer/isentek/ist8310
+		#optical_flow # all available optical flow drivers
+		#osd
+		#pca9685
+		#pca9685_pwm_out
 		power_monitor/ina226
 		#protocol_splitter
 		pwm_out_sim
 		pwm_out
 		px4io
 		rc_input
-		rpm
+		#roboclaw
+		#rpm
 		safety_button
-		telemetry # all available telemetry drivers
+		#telemetry # all available telemetry drivers
 		test_ppm
 		tone_alarm
 		uavcan
 	MODULES
 		airspeed_selector
-		attitude_estimator_q
+		#attitude_estimator_q
 		camera_feedback
 		commander
 		dataman
 		ekf2
-		esc_battery
+		#esc_battery
 		events
 		flight_mode_manager
 		fw_att_control
@@ -83,7 +84,7 @@ px4_add_board(
 		#micrortps_bridge
 		navigator
 		rc_update
-		rover_pos_control
+		#rover_pos_control
 		sensors
 		sih
 		temperature_compensation
@@ -94,6 +95,7 @@ px4_add_board(
 	SYSTEMCMDS
 		bl_update
 		dmesg
+		dumpfile
 		esc_calib
 		gpio
 		hardfault_log
@@ -102,6 +104,7 @@ px4_add_board(
 		mft
 		microbench
 		mixer
+		motor_ramp
 		motor_test
 		mtd
 		nshterm
@@ -110,10 +113,11 @@ px4_add_board(
 		perf
 		pwm
 		reboot
+		#reflect
 		sd_bench
 		serial_test
 		system_time
-#		tests # tests and test runner
+		tests # tests and test runner
 		top
 		topic_listener
 		tune_control
@@ -123,8 +127,8 @@ px4_add_board(
 		work_queue
 	EXAMPLES
 		fake_gps
-		#fake_imu
-		#fake_magnetometer
+		fake_imu
+		fake_magnetometer
 		#fixedwing_control # Tutorial code from https://px4.io/dev/example_fixedwing_control
 		#hello
 		#hwtest # Hardware test

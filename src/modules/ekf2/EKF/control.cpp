@@ -529,8 +529,7 @@ void Ekf::controlGpsFusion()
 				// If the heading is not aligned, reset the yaw and magnetic field states
 				// Do not use external vision for yaw if using GPS because yaw needs to be
 				// defined relative to an NED reference frame
-				if (!_control_status.flags.yaw_align
-				    || _control_status.flags.ev_yaw
+				if (_control_status.flags.ev_yaw
 				    || _mag_inhibit_yaw_reset_req
 				    || _mag_yaw_reset_req) {
 
@@ -540,7 +539,7 @@ void Ekf::controlGpsFusion()
 					stopEvYawFusion();
 					_inhibit_ev_yaw_use = true;
 
-				} else {
+				} else if (_control_status.flags.yaw_align) {
 					// If the heading is valid start using gps aiding
 					startGpsFusion();
 				}
@@ -567,10 +566,11 @@ void Ekf::controlGpsFusion()
 
 		// handle case where we are not currently using GPS, but need to align yaw angle using EKF-GSF before
 		// we can start using GPS
-		const bool align_yaw_using_gsf = !_control_status.flags.gps && _do_ekfgsf_yaw_reset
-						 && isTimedOut(_ekfgsf_yaw_reset_time, 5000000);
+		const bool align_yaw_using_gsf = !_control_status.flags.yaw_align
+		                                 && (_params.mag_fusion_type == MAG_FUSE_TYPE_NONE);
 
-		if (align_yaw_using_gsf) {
+		if ((align_yaw_using_gsf || _do_ekfgsf_yaw_reset)
+		    && isTimedOut(_ekfgsf_yaw_reset_time, 5000000)){
 			if (resetYawToEKFGSF()) {
 				_ekfgsf_yaw_reset_time = _time_last_imu;
 				_do_ekfgsf_yaw_reset = false;
@@ -751,7 +751,7 @@ void Ekf::controlGpsFusion()
 void Ekf::controlGpsYawFusion(bool gps_checks_passing, bool gps_checks_failing)
 {
 	if (!(_params.fusion_mode & MASK_USE_GPSYAW)
-	    || _is_gps_yaw_faulty) {
+	    || _control_status.flags.gps_yaw_fault) {
 
 		stopGpsYawFusion();
 		return;
@@ -785,12 +785,15 @@ void Ekf::controlGpsYawFusion(bool gps_checks_passing, bool gps_checks_failing)
 					if (_nb_gps_yaw_reset_available > 0) {
 						// Data seems good, attempt a reset
 						resetYawToGps();
-						_nb_gps_yaw_reset_available--;
+
+						if (_control_status.flags.in_air) {
+							_nb_gps_yaw_reset_available--;
+						}
 
 					} else if (starting_conditions_passing) {
 						// Data seems good, but previous reset did not fix the issue
 						// something else must be wrong, declare the sensor faulty and stop the fusion
-						_is_gps_yaw_faulty = true;
+						_control_status.flags.gps_yaw_fault = true;
 						stopGpsYawFusion();
 
 					} else {

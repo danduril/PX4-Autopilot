@@ -44,9 +44,9 @@ set(msg_files
 	airspeed.msg
 	airspeed_validated.msg
 	airspeed_wind.msg
-	baro_bias_estimate.msg
 	battery_status.msg
 	camera_capture.msg
+	camera_status.msg
 	camera_trigger.msg
 	cellular_status.msg
 	collision_constraints.msg
@@ -58,9 +58,9 @@ set(msg_files
 	distance_sensor.msg
 	ekf2_timestamps.msg
 	ekf_gps_drift.msg
-	event.msg
 	esc_report.msg
 	esc_status.msg
+	estimator_baro_bias.msg
 	estimator_event_flags.msg
 	estimator_innovations.msg
 	estimator_optical_flow_vel.msg
@@ -69,6 +69,7 @@ set(msg_files
 	estimator_states.msg
 	estimator_status.msg
 	estimator_status_flags.msg
+	event.msg
 	follow_target.msg
 	generator_status.msg
 	geofence_result.msg
@@ -84,6 +85,7 @@ set(msg_files
 	heater_status.msg
 	home_position.msg
 	hover_thrust_estimate.msg
+	internal_combustion_engine_status.msg
 	input_rc.msg
 	iridiumsbd_status.msg
 	irlock_report.msg
@@ -117,8 +119,6 @@ set(msg_files
 	power_monitor.msg
 	pwm_input.msg
 	px4io_status.msg
-	qshell_req.msg
-	qshell_retval.msg
 	radio_status.msg
 	rate_ctrl_status.msg
 	rc_channels.msg

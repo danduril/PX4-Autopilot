@@ -48,6 +48,7 @@
 #include "mavlink_timesync.h"
 #include "tune_publisher.h"
 
+#include <geo/geo.h>
 #include <lib/drivers/accelerometer/PX4Accelerometer.hpp>
 #include <lib/drivers/barometer/PX4Barometer.hpp>
 #include <lib/drivers/gyroscope/PX4Gyroscope.hpp>
@@ -62,6 +63,7 @@
 #include <uORB/topics/actuator_outputs.h>
 #include <uORB/topics/airspeed.h>
 #include <uORB/topics/battery_status.h>
+#include <uORB/topics/camera_status.h>
 #include <uORB/topics/cellular_status.h>
 #include <uORB/topics/collision_report.h>
 #include <uORB/topics/differential_pressure.h>
@@ -175,6 +177,7 @@ private:
 	void handle_message_play_tune(mavlink_message_t *msg);
 	void handle_message_play_tune_v2(mavlink_message_t *msg);
 	void handle_message_radio_status(mavlink_message_t *msg);
+	void handle_message_rc_channels(mavlink_message_t *msg);
 	void handle_message_rc_channels_override(mavlink_message_t *msg);
 	void handle_message_serial_control(mavlink_message_t *msg);
 	void handle_message_set_actuator_control_target(mavlink_message_t *msg);
@@ -266,6 +269,7 @@ private:
 	uORB::Publication<actuator_controls_s>			_actuator_controls_pubs[4] {ORB_ID(actuator_controls_0), ORB_ID(actuator_controls_1), ORB_ID(actuator_controls_2), ORB_ID(actuator_controls_3)};
 	uORB::Publication<airspeed_s>				_airspeed_pub{ORB_ID(airspeed)};
 	uORB::Publication<battery_status_s>			_battery_pub{ORB_ID(battery_status)};
+	uORB::Publication<camera_status_s>					_camera_status_pub{ORB_ID(camera_status)};
 	uORB::Publication<cellular_status_s>			_cellular_status_pub{ORB_ID(cellular_status)};
 	uORB::Publication<collision_report_s>			_collision_report_pub{ORB_ID(collision_report)};
 	uORB::Publication<differential_pressure_s>		_differential_pressure_pub{ORB_ID(differential_pressure)};
@@ -344,6 +348,9 @@ private:
 	static constexpr unsigned int	MOM_SWITCH_COUNT{8};
 	uint8_t				_mom_switch_pos[MOM_SWITCH_COUNT] {};
 	uint16_t			_mom_switch_state{0};
+
+	map_projection_reference_s _global_local_proj_ref{};
+	float _global_local_alt0{NAN};
 
 	hrt_abstime			_last_utm_global_pos_com{0};
 

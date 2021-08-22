@@ -298,7 +298,8 @@ public:
 	// returns false when data is not available
 	bool getDataEKFGSF(float *yaw_composite, float *yaw_variance, float yaw[N_MODELS_EKFGSF],
 			   float innov_VN[N_MODELS_EKFGSF], float innov_VE[N_MODELS_EKFGSF], float weight[N_MODELS_EKFGSF]);
-	void getBaroBiasEstimatorStatus(float &bias, float &bias_var, float &innov, float &innov_var, float &innov_test_ratio);
+
+	const BaroBiasEstimator::status &getBaroBiasEstimatorStatus() const { return _baro_b_est.getStatus(); }
 
 private:
 
@@ -395,7 +396,7 @@ private:
 	uint64_t _time_yaw_started{0};		///< last system time in usec that a yaw rotation manoeuvre was detected
 	uint8_t _num_bad_flight_yaw_events{0};	///< number of times a bad heading has been detected in flight and required a yaw reset
 	uint64_t _mag_use_not_inhibit_us{0};	///< last system time in usec before magnetometer use was inhibited
-	float _last_static_yaw{0.0f};		///< last yaw angle recorded when on ground motion checks were passing (rad)
+	float _last_static_yaw{NAN};		///< last yaw angle recorded when on ground motion checks were passing (rad)
 
 	bool _mag_inhibit_yaw_reset_req{false};	///< true when magnetometer inhibit has been active for long enough to require a yaw reset when conditions improve.
 	bool _mag_yaw_reset_req{false};		///< true when a reset of the yaw using the magnetometer data has been requested
@@ -535,7 +536,6 @@ private:
 	// height sensor status
 	bool _baro_hgt_faulty{false};		///< true if valid baro data is unavailable for use
 	bool _gps_hgt_intermittent{false};	///< true if gps height into the buffer is intermittent
-	bool _is_gps_yaw_faulty{false};		///< true if gps yaw data is rejected by the filter for too long
 
 	// imu fault status
 	uint64_t _time_bad_vert_accel{0};	///< last time a bad vertical accel was detected (uSec)
